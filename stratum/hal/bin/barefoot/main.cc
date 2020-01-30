@@ -34,6 +34,7 @@ int switch_pci_sysfs_str_get(char *name, size_t name_size);
 #include "stratum/hal/lib/barefoot/bf_switch.h"
 #include "stratum/lib/security/auth_policy_checker.h"
 #include "stratum/lib/security/credentials_manager.h"
+#include "stratum/hal/lib/gearbox/gearbox.h"
 
 using ::pi::fe::proto::DeviceMgr;
 
@@ -202,5 +203,6 @@ Main(int argc, char* argv[]) {
 
 int
 main(int argc, char* argv[]) {
-  return stratum::hal::barefoot::Main(argc, argv);
+    initGearbox();
+    return stratum::hal::barefoot::Main(argc, argv);
 }

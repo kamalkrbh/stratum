@@ -75,6 +75,9 @@ bmv2_configure(name = "local_bmv2_bin")
 load("//stratum/hal/lib/barefoot:barefoot.bzl", "barefoot_configure")
 barefoot_configure(name = "local_barefoot_bin")
 
+load("//stratum/hal/lib/gearbox:stordis_gearbox.bzl", "stordis2556_configure")
+stordis2556_configure(name = "local_stordis2556_bin")
+
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 boost_deps()
 

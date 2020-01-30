@@ -47,6 +47,7 @@ stratum_cc_binary(
         "@local_barefoot_bin//:bf_drivers",
         "@local_barefoot_bin//:bf_sys",
         "@local_barefoot_bin//:bf_utils",
+        "//stratum/hal/lib/gearbox:stordis_gearbox",
     ],
     data = [
         "tofino_skip_p4.conf",
