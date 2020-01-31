@@ -30,6 +30,21 @@ package(
 )
 
 config_setting(
+    name = "barefoot_profile",
+    values = {"define": "profile=barefoot"},
+)
+
+config_setting(
+    name = "stordis_bf2556x_profile",
+    values = {"define": "profile=stordis_bf2556x"},
+)
+
+config_setting(
+    name = "dummy_phal_profile",
+    values = {"define": "profile=dummy"},
+)
+
+config_setting(
     name = "stratum_ppc",
     values = {
         "crosstool_top": "//unsupported_toolchains/crosstoolng_powerpc32_8540",
