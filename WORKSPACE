@@ -85,6 +85,9 @@ boost_deps()
 load("//stratum/hal/lib/phal/onlp:onlp.bzl", "onlp_configure")
 onlp_configure(name = "local_onlp_bin")
 
+load("//stratum/hal/lib/phal/stordis_gearbox:stordis_gearbox.bzl", "stordis_gearbox_configure")
+stordis_gearbox_configure(name = "local_stordis_gearbox_bin")
+
 load("@com_google_googleapis//:repository_rules.bzl", "switched_rules_by_language")
 switched_rules_by_language(
     name = "com_google_googleapis_imports",
