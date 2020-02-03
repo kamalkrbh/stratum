@@ -11,11 +11,11 @@
 namespace stratum {
     namespace hal {
         namespace phal {
-            namespace stordis_gearbox {
-                class StordisGBPhal : public PhalInterface {
+            namespace stordis_timesync {
+                class StordisTimesyncPhal : public PhalInterface {
                 public :
                     virtual ::util::Status Initialize();
-                    static StordisGBPhal* CreateSingleton() LOCKS_EXCLUDED(config_lock_);
+                    static StordisTimesyncPhal* CreateSingleton() LOCKS_EXCLUDED(config_lock_);
                 };
             }  // namespace onlp
         }  // namespace phal

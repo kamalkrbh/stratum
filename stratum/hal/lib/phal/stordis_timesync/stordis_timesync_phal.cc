@@ -20,29 +20,28 @@
 // Created by kamal on 30.01.20.
 //
 
-#include "stordis_gearbox_phal.h"
+#include "stordis_timesync_phal.h"
 #include <direct/SAL_Direct.h>
 #include "stratum/glue/status/status.h"
 
 namespace stratum {
     namespace hal {
         namespace phal {
-            namespace stordis_gearbox {
+            namespace stordis_timesync {
 
-                StordisGBPhal* StordisGBPhal::singleton_ = nullptr;
+                StordisTimesyncPhal* StordisTimesyncPhal::singleton_ = nullptr;
 
-                StordisGBPhal *StordisGBPhal::CreateSingleton() {
+                StordisTimesyncPhal *StordisTimesyncPhal::CreateSingleton() {
                     absl::WriterMutexLock l(&init_lock_);
                     if (!singleton_) {
-                        singleton_ = new StordisGBPhal();
+                        singleton_ = new StordisTimesyncPhal();
                         singleton_->Initialize();
                     }
                     return singleton_;
                 }
 
-                ::util::Status StordisGBPhal::Initialize() {
-                    return SAL::startGearBox();
-
+                ::util::Status StordisTimesyncPhal::Initialize() {
+                    return SAL::startPTP();
                 }
             }  // namespace onlp
         }  // namespace phal

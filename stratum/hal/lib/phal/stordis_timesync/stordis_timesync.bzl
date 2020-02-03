@@ -42,16 +42,9 @@ cc_import(
   alwayslink = 1,
 )
 
-cc_import(
-  name = "sal_gearbox_lib",
-  hdrs = [],  # see cc_library rule above
-  static_library = "sal-home/lib/libgearbox.a",
-  alwayslink = 1,
-)
-
 """)
 
-stordis2556_configure = repository_rule(
+stordis_timesync_configure = repository_rule(
     implementation = _impl,
     local = True,
     environ = ["SAL_HOME"],

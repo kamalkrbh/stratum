@@ -20,16 +20,15 @@ package(
     default_visibility = ["//visibility:public"],
 )
 
-load("//bazel:rules.bzl", "stratum_cc_library", "HOST_ARCHES")
+load("//bazel:rules.bzl", "HOST_ARCHES", "stratum_cc_library")
 
 stratum_cc_library(
-    name = "stordis_gearbox",
-    hdrs = ["gearbox.h",],
-    srcs = ["gearbox.cc",],
-
+    name = "stordis_timesync",
+    srcs = ["stordis_timesync_phal.cc"],
+    hdrs = ["stordis_timesync_phal.h"],
     deps = [
-        "@local_stordis2556_bin//:sal_headers",
-        "@local_stordis2556_bin//:sal_lib",
-        "@local_stordis2556_bin//:sal_gearbox_lib",
+        "//stratum/hal/lib/common:phal_interface",
+        "@local_stordis_gearbox_bin//:sal_headers",
+        "@local_stordis_gearbox_bin//:sal_lib",
     ],
 )

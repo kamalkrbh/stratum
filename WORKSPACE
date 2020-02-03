@@ -40,74 +40,93 @@ workspace(name = "com_github_stratum_stratum")
 # ---------------------------------------------------------------------------
 
 load("//bazel/rules:build_tools.bzl", "build_tools_deps")
+
 build_tools_deps()
 
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+
 gazelle_dependencies()
 
 load("//bazel/rules:proto_gen.bzl", "proto_gen_deps")
+
 proto_gen_deps()
 
 # ---------------------------------------------------------------------------
 #       Load Stratum dependencies
 # ---------------------------------------------------------------------------
 load("//bazel:deps.bzl", "stratum_deps")
+
 stratum_deps()
 
 # ---------------------------------------------------------------------------
 #        Load transitive dependencies
 # ---------------------------------------------------------------------------
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
 grpc_deps()
 
-load("@io_bazel_rules_python//python:pip.bzl", "pip_repositories", "pip_import")
+load("@io_bazel_rules_python//python:pip.bzl", "pip_import", "pip_repositories")
+
 pip_import(
     name = "grpc_python_dependencies",
     requirements = "@com_github_grpc_grpc//:requirements.bazel.txt",
 )
 
 load("@com_github_grpc_grpc//bazel:grpc_python_deps.bzl", "grpc_python_deps")
+
 grpc_python_deps()
 
 load("//stratum/hal/bin/bmv2:bmv2.bzl", "bmv2_configure")
+
 bmv2_configure(name = "local_bmv2_bin")
 
 load("//stratum/hal/lib/barefoot:barefoot.bzl", "barefoot_configure")
+
 barefoot_configure(name = "local_barefoot_bin")
 
 load("//stratum/hal/lib/gearbox:stordis_gearbox.bzl", "stordis2556_configure")
+
 stordis2556_configure(name = "local_stordis2556_bin")
 
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+
 boost_deps()
 
-
 load("//stratum/hal/lib/phal/onlp:onlp.bzl", "onlp_configure")
+
 onlp_configure(name = "local_onlp_bin")
 
 load("//stratum/hal/lib/phal/stordis_gearbox:stordis_gearbox.bzl", "stordis_gearbox_configure")
+
 stordis_gearbox_configure(name = "local_stordis_gearbox_bin")
 
+load("//stratum/hal/lib/phal/stordis_timesync:stordis_timesync.bzl", "stordis_timesync_configure")
+
+stordis_gearbox_configure(name = "local_stordis_timesync_bin")
+
 load("@com_google_googleapis//:repository_rules.bzl", "switched_rules_by_language")
+
 switched_rules_by_language(
     name = "com_google_googleapis_imports",
-    grpc = True,
     cc = True,
+    grpc = True,
     python = True,
 )
-
 
 # ---------------------------------------------------------------------------
 #       Load Golang dependencies.
 # ---------------------------------------------------------------------------
-load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_toolchains")
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
 go_rules_dependencies()
+
 go_register_toolchains()
 
 # ---------------------------------------------------------------------------
 #       Load CDLang dependencies.
 # ---------------------------------------------------------------------------
 load("//stratum/testing/cdlang:deps.bzl", "cdlang_rules_dependencies")
+
 cdlang_rules_dependencies()
 
 # ---------------------------------------------------------------------------
