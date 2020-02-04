@@ -34,7 +34,14 @@ int switch_pci_sysfs_str_get(char *name, size_t name_size);
 #include "stratum/hal/lib/barefoot/bf_switch.h"
 #include "stratum/lib/security/auth_policy_checker.h"
 #include "stratum/lib/security/credentials_manager.h"
-#include "stratum/hal/lib/gearbox/gearbox.h"
+
+#ifdef STORDIS_GB
+#include "stratum/hal/lib/phal/stordis_gearbox/stordis_gearbox_phal.h"
+#endif
+
+#if defined(STORDIS_GB) || defined(STORDIS_TS)
+#include "stratum/hal/lib/phal/stordis_timesync/stordis_timesync_phal.h"
+#endif
 
 using ::pi::fe::proto::DeviceMgr;
 
@@ -159,6 +166,16 @@ Main(int argc, char* argv[]) {
   } else {
     phal_impl = phal::onlp::OnlpPhal::CreateSingleton();
   }
+
+    PhalInterface *phal_stordis_gb_impl;
+#ifdef STORDIS_GB
+    phal_stordis_gb_impl=phal::stordis_gearbox::StordisGBPhal::CreateSingleton();
+#endif
+    PhalInterface *phal_stordis_ts_impl;
+#if defined(STORDIS_GB) || defined(STORDIS_TS)
+    phal_stordis_ts_impl=phal::stordis_timesync::StordisTimesyncPhal::CreateSingleton();
+#endif
+
   std::map<int, pi::PINode*> unit_to_pi_node = {
     {unit, pi_node.get()},
   };
@@ -203,6 +220,5 @@ Main(int argc, char* argv[]) {
 
 int
 main(int argc, char* argv[]) {
-    initGearbox();
     return stratum::hal::barefoot::Main(argc, argv);
 }

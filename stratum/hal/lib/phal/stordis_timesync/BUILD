@@ -23,10 +23,16 @@ package(
 load("//bazel:rules.bzl", "HOST_ARCHES", "stratum_cc_library")
 
 stratum_cc_library(
-    name = "stordis_timesync",
-    srcs = ["stordis_timesync_phal.cc"],
+    name = "stordis_timesync_headers",
     hdrs = ["stordis_timesync_phal.h"],
+    deps = [],
+)
+
+stratum_cc_library(
+    name = "stordis_timesync_phal",
+    srcs = ["stordis_timesync_phal.cc"],
     deps = [
+        ":stordis_timesync_headers",
         "//stratum/hal/lib/common:phal_interface",
         "@local_stordis_gearbox_bin//:sal_headers",
         "@local_stordis_gearbox_bin//:sal_lib",

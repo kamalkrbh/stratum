@@ -31,12 +31,21 @@ package(
 
 config_setting(
     name = "barefoot_profile",
-    values = {"define": "profile=barefoot"},
+    values = {
+        "define": "profile=barefoot",
+    },
 )
 
 config_setting(
-    name = "stordis_bf2556x_profile",
-    values = {"define": "profile=stordis_bf2556x"},
+    name = "stordis_bf2556x_1t_profile",
+    values = {
+        "define": "profile=stordis_bf2556x_1t",
+    },
+)
+
+config_setting(
+    name = "stordis_bf6064x_t_profile",
+    values = {"define": "profile=stordis_bf6064x_t"},
 )
 
 config_setting(

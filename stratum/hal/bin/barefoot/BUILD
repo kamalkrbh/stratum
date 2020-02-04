@@ -25,20 +25,41 @@ load("//bazel:rules.bzl", "HOST_ARCHES", "stratum_cc_binary", "stratum_cc_librar
 
 stratum_cc_binary(
     name = "stratum_bf",
+    srcs = [
+        "main.cc",
+    ],
+    arches = HOST_ARCHES,
     deps = select({
-        "//conditions:default": ["bf_lib"],
-        "//stratum:stordis_bf2556x_profile": ["bf_lib"],
-        "//stratum:dummy_phal_profile": ["bf_lib"],
+        "//conditions:default": [
+            "bf_lib",
+        ],
+        "//stratum:stordis_bf2556x_1t_profile": [
+            "bf_lib",
+            "stordis_ts_lib",
+            "stordis_gb_lib",
+        ],
+        "//stratum:stordis_bf6064x_t_profile": [
+            "bf_lib",
+            "//stratum/hal/lib/phal/stordis_timesync:stordis_timesync_phal",
+        ],
         "//stratum:barefoot_profile": ["bf_lib"],
     }),
 )
 
 stratum_cc_library(
+    name = "stordis_ts_lib",
+    copts = ["-DSTORDIS_TS"],
+    deps = ["//stratum/hal/lib/phal/stordis_timesync:stordis_timesync_phal"],
+)
+
+stratum_cc_library(
+    name = "stordis_gb_lib",
+    copts = ["-DSTORDIS_GB"],
+    deps = ["//stratum/hal/lib/phal/stordis_gearbox:stordis_gearbox_phal"],
+)
+
+stratum_cc_library(
     name = "bf_lib",
-    srcs = [
-        "main.cc",
-    ],
-    arches = HOST_ARCHES,
     data = [
         "platforms/x86-64-accton-wedge100bf-32x-r0.json",
         "platforms/x86-64-delta-ag9064v1-r0.json",
@@ -53,7 +74,6 @@ stratum_cc_library(
         "//stratum/hal/lib/barefoot:bf_pal_wrapper",
         "//stratum/hal/lib/barefoot:bf_switch",
         "//stratum/hal/lib/common:hal",
-        "//stratum/hal/lib/gearbox:stordis_gearbox",
         "//stratum/hal/lib/phal:phal_sim",
         "//stratum/hal/lib/phal/onlp:onlpphal",
         "//stratum/hal/lib/pi:pi_node_bf",

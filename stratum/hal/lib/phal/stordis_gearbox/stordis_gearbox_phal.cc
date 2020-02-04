@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2020-present STORDIS GmbH
 
@@ -22,7 +21,7 @@
 
 #include "stordis_gearbox_phal.h"
 #include <direct/SAL_Direct.h>
-#include "stratum/glue/status/status.h"
+
 
 namespace stratum {
     namespace hal {
@@ -30,8 +29,9 @@ namespace stratum {
             namespace stordis_gearbox {
 
                 StordisGBPhal* StordisGBPhal::singleton_ = nullptr;
+                ABSL_CONST_INIT absl::Mutex StordisGBPhal::init_lock_(absl::kConstInit);
 
-                StordisGBPhal *StordisGBPhal::CreateSingleton() {
+                StordisGBPhal* StordisGBPhal::CreateSingleton() {
                     absl::WriterMutexLock l(&init_lock_);
                     if (!singleton_) {
                         singleton_ = new StordisGBPhal();
@@ -41,9 +41,54 @@ namespace stratum {
                 }
 
                 ::util::Status StordisGBPhal::Initialize() {
-                    return SAL::startGearBox();
+                    SAL::startGearBox();
+                    return ::util::OkStatus();
 
                 }
+
+                ::util::Status StordisGBPhal::PushChassisConfig(const ChassisConfig& config) {
+                    absl::WriterMutexLock l(&config_lock_);
+                    // TODO(unknown): Process Chassis Config here
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisGBPhal::VerifyChassisConfig(const ChassisConfig& config) {
+                    // TODO(unknown): Implement this function.
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisGBPhal::Shutdown() {
+                    absl::WriterMutexLock l(&config_lock_);
+                    // TODO(unknown): add clean up code
+                    initialized_ = false;
+
+                    return ::util::OkStatus();
+                }
+
+                ::util::StatusOr<int> StordisGBPhal::RegisterTransceiverEventWriter(
+                        std::unique_ptr<ChannelWriter<TransceiverEvent>> writer,
+                        int priority){
+                    return 1;
+                }
+
+                ::util::Status StordisGBPhal::UnregisterTransceiverEventWriter(int id){
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisGBPhal::GetFrontPanelPortInfo(
+                        int slot, int port, FrontPanelPortInfo* fp_port_info){
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisGBPhal::SetPortLedState(int slot, int port, int channel,
+                                               LedColor color, LedState state){
+                    return ::util::OkStatus();
+                }
+                ::util::Status StordisGBPhal::RegisterSfpConfigurator(
+                        int slot, int port, SfpConfigurator* configurator) {
+                    return ::util::OkStatus();
+                }
+
             }  // namespace onlp
         }  // namespace phal
     }  // namespace hal

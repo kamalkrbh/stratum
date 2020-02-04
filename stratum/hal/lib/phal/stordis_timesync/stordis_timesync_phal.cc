@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2020-present STORDIS GmbH
 
@@ -29,7 +28,9 @@ namespace stratum {
         namespace phal {
             namespace stordis_timesync {
 
-                StordisTimesyncPhal* StordisTimesyncPhal::singleton_ = nullptr;
+                StordisTimesyncPhal *StordisTimesyncPhal::singleton_ = nullptr;
+                ABSL_CONST_INIT absl::Mutex
+                StordisTimesyncPhal::init_lock_(absl::kConstInit);
 
                 StordisTimesyncPhal *StordisTimesyncPhal::CreateSingleton() {
                     absl::WriterMutexLock l(&init_lock_);
@@ -41,8 +42,56 @@ namespace stratum {
                 }
 
                 ::util::Status StordisTimesyncPhal::Initialize() {
-                    return SAL::startPTP();
+                    SAL::startPTP();
+                    return ::util::OkStatus();
                 }
+
+                ::util::Status StordisTimesyncPhal::PushChassisConfig(const ChassisConfig& config) {
+                    absl::WriterMutexLock l(&config_lock_);
+                    // TODO(unknown): Process Chassis Config here
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisTimesyncPhal::VerifyChassisConfig(const ChassisConfig &config) {
+                    // TODO(unknown): Implement this function.
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisTimesyncPhal::Shutdown() {
+                    absl::WriterMutexLock l(&config_lock_);
+
+                    // TODO(unknown): add clean up code
+
+                    initialized_ = false;
+
+                    return ::util::OkStatus();
+                }
+
+                ::util::StatusOr<int> StordisTimesyncPhal::RegisterTransceiverEventWriter(
+                        std::unique_ptr <ChannelWriter<TransceiverEvent>> writer,
+                        int priority) {
+                    return 1;
+                }
+
+                ::util::Status StordisTimesyncPhal::UnregisterTransceiverEventWriter(int id) {
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisTimesyncPhal::GetFrontPanelPortInfo(
+                        int slot, int port, FrontPanelPortInfo *fp_port_info) {
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisTimesyncPhal::SetPortLedState(int slot, int port, int channel,
+                                                                    LedColor color, LedState state) {
+                    return ::util::OkStatus();
+                }
+
+                ::util::Status StordisTimesyncPhal::RegisterSfpConfigurator(
+                        int slot, int port, SfpConfigurator *configurator) {
+                    return ::util::OkStatus();
+                }
+
             }  // namespace onlp
         }  // namespace phal
     }  // namespace hal
