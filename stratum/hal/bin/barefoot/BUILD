@@ -40,7 +40,7 @@ stratum_cc_binary(
         ],
         "//stratum:stordis_bf6064x_t_profile": [
             "bf_lib",
-            "//stratum/hal/lib/phal/stordis_timesync:stordis_timesync_phal",
+            "stordis_gb_lib",
         ],
         "//stratum:barefoot_profile": ["bf_lib"],
     }),
