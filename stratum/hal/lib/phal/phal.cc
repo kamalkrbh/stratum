@@ -38,6 +38,11 @@
 // TODO(plvision): add tai includes here
 #endif  // defined(WITH_TAI)
 
+#if defined(WITH_GB)
+#include "stratum/hal/lib/phal/gb/gb_phal.h"
+#include "stratum/hal/lib/phal/gb/gb_wrapper.h"
+#endif
+
 DECLARE_string(phal_config_path);
 
 namespace stratum {
@@ -82,6 +87,22 @@ Phal* Phal::CreateSingleton() {
       ASSIGN_OR_RETURN(auto configurator, onlp::OnlpSwitchConfigurator::Make(
                                               onlp_phal, onlp_wrapper));
       configurators.push_back(std::move(configurator));
+    }
+#endif
+
+      // Set up GB
+#if defined(WITH_GB)
+      {
+      auto* gb_wrapper = gb::GbWrapper::CreateSingleton();
+      auto* gb_phal = gb::GbPhal::CreateSingleton(gb_wrapper);
+      phal_interfaces_.push_back(gb_phal);
+    }
+#endif
+
+    // Set up time sync device
+#if defined(WITH_TS)
+      {
+      //TODO : TS specific thinggs to be initialized.
     }
 #endif
 

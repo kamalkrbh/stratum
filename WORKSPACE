@@ -82,6 +82,9 @@ boost_deps()
 load("//stratum/hal/lib/phal/onlp:onlp.bzl", "onlp_configure")
 onlp_configure(name = "local_onlp_bin")
 
+load("//stratum/hal/lib/phal/gb:gb.bzl", "gb_configure")
+gb_configure(name = "local_sal_bin")
+
 load("@com_google_googleapis//:repository_rules.bzl", "switched_rules_by_language")
 switched_rules_by_language(
     name = "com_google_googleapis_imports",
