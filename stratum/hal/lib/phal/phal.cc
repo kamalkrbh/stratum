@@ -39,6 +39,11 @@
 #include "stratum/hal/lib/phal/tai/tai_switch_configurator.h"
 #endif  // defined(WITH_TAI)
 
+#if defined(WITH_GB)
+#include "stratum/hal/lib/phal/gb/gb_phal.h"
+#include "stratum/hal/lib/phal/gb/gb_wrapper.h"
+#endif
+
 DECLARE_string(phal_config_path);
 
 namespace stratum {
@@ -95,6 +100,22 @@ Phal* Phal::CreateSingleton() {
       configurators.push_back(std::move(configurator));
     }
 #endif  // defined(WITH_TAI)
+
+      // Set up GB
+#if defined(WITH_GB)
+      {
+      auto* gb_wrapper = gb::GbWrapper::CreateSingleton();
+      auto* gb_phal = gb::GbPhal::CreateSingleton(gb_wrapper);
+      phal_interfaces_.push_back(gb_phal);
+    }
+#endif
+
+    // Set up time sync device
+#if defined(WITH_TS)
+      {
+      //TODO : TS specific thinggs to be initialized.
+    }
+#endif
 
     PhalInitConfig phal_config;
     if (FLAGS_phal_config_path.empty()) {

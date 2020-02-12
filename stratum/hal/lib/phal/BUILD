@@ -38,6 +38,33 @@ package(
 # The following config settings allow to specify which PHAL backends to use.
 # Each can theoretically enable independently, as long as they configure
 # different parts of the attribute database.
+config_setting(
+    name = "with_gb",
+    define_values = {
+        "phal_with_gb": "true",
+    },
+)
+
+config_setting(
+    name = "without_gb",
+    define_values = {
+        "phal_with_gb": "false",
+    },
+)
+
+config_setting(
+    name = "with_ts",
+    define_values = {
+        "phal_with_ts": "true",
+    },
+)
+
+config_setting(
+    name = "without_ts",
+    define_values = {
+        "phal_with_ts": "false",
+    },
+)
 
 config_setting(
     name = "with_onlp",
@@ -82,6 +109,22 @@ tai_deps = [
     "//stratum/hal/lib/phal/tai:tai_phal",
 ]
 
+gb_defines = [
+    "WITH_GB",
+]
+
+gb_deps = [
+    "//stratum/hal/lib/phal/gb:gb_phal",
+]
+
+ts_defines = [
+    "WITH_TS",
+]
+
+ts_deps = [
+    "//stratum/hal/lib/phal/ts:ts_phal",
+]
+
 # Default Phal selection (the absence of both with_* and without_*) is done by
 # filling the //conditions:default" or leaving it empty.
 phal_defines = select({
@@ -92,6 +135,14 @@ phal_defines = select({
     ":with_tai": tai_defines,
     ":without_tai": [],
     "//conditions:default": [],
+}) + select({
+    ":with_gb": gb_defines,
+    ":without_gb": [],
+    "//conditions:default": gb_defines,
+}) + select({
+  ":with_ts": ts_defines,
+  ":without_ts": [],
+  "//conditions:default": ts_defines,
 })
 
 phal_deps = select({
@@ -102,7 +153,15 @@ phal_deps = select({
     ":with_tai": tai_deps,
     ":without_tai": [],
     "//conditions:default": [],
-})
+}) + select({
+      ":with_gb": gb_deps,
+      ":without_gb": [],
+      "//conditions:default": [],
+  }) + select({
+        ":with_ts": ts_deps,
+        ":without_ts": [],
+        "//conditions:default": [],
+    })
 
 stratum_cc_library(
     name = "attribute_database_interface",
