@@ -125,6 +125,22 @@ ts_deps = [
     "//stratum/hal/lib/phal/ts:ts_phal",
 ]
 
+gb_defines = [
+    "WITH_GB",
+]
+
+gb_deps = [
+    "//stratum/hal/lib/phal/gb:gb_phal",
+]
+
+ts_defines = [
+    "WITH_TS",
+]
+
+ts_deps = [
+    "//stratum/hal/lib/phal/ts:ts_phal",
+]
+
 # Default Phal selection (the absence of both with_* and without_*) is done by
 # filling the //conditions:default" or leaving it empty.
 phal_defines = select({
