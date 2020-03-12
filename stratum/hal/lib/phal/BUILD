@@ -127,11 +127,11 @@ phal_defines = select({
 }) + select({
     ":with_gb": gb_defines,
     ":without_gb": [],
-    "//conditions:default": gb_defines,
+    "//conditions:default": [],
 }) + select({
   ":with_ts": ts_defines,
   ":without_ts": [],
-  "//conditions:default": ts_defines,
+  "//conditions:default": [],
 })
 
 phal_deps = select({
