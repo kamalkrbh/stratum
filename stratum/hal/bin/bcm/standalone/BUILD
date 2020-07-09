@@ -1,22 +1,9 @@
-#
 # Copyright 2018 Google LLC
 # Copyright 2018-present Open Networking Foundation
 # Copyright 2019 Broadcom. All rights reserved. The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# SPDX-License-Identifier: Apache-2.0
 
-load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar", "pkg_deb")
+load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_deb")
 
 licenses(["notice"])  # Apache v2
 
@@ -89,15 +76,59 @@ stratum_package(
 )
 
 pkg_tar(
-    name = "stratum_bcm_package",
-    extension = "tar.gz",
+    name = "stratum_bcm_bin",
     srcs = [
         ":stratum_bcm",
-        "@com_github_opennetworkinglab_sdklt//:kernel_modules",
-        "@com_github_opennetworkinglab_sdklt//:sdklt_cli",
-    ],
-    deps = [
-        "//stratum/hal/config:configs",
+        "start-stratum.sh",
+        "load-kernel-modules.sh",
     ],
     mode = "0755",
+    package_dir = "/usr/bin",
+)
+
+pkg_tar(
+    name = "stratum_bcm_lib",
+    srcs = [
+        "@com_github_opennetworkinglab_sdklt//:kernel_modules",
+    ],
+    package_dir = "/usr/lib/stratum",
+)
+
+pkg_tar(
+    name = "stratum_bcm_etc",
+    deps = [
+        "//stratum/hal/config:platform_configs_tar",
+    ],
+    package_dir = "/etc/stratum",
+)
+
+pkg_tar(
+    name = "stratum_bcm_all",
+    deps = [
+        ":stratum_bcm_bin",
+        ":stratum_bcm_lib",
+        ":stratum_bcm_etc",
+    ],
+)
+
+pkg_deb(
+    name = "stratum_bcm_deb",
+    package = "stratum-bcm",
+    version = "0.0.1",
+    description = "Stratum for Broadcom switches",
+    architecture = "amd64",
+    data = ":stratum_bcm_all",
+    depends = [
+        "kmod",
+        "libboost-thread1.62.0",
+        "libedit2",
+        "libjudydebian1",
+        "libssl1.1",
+        "libyaml-0-2",
+    ] + select({
+        "//stratum/hal/lib/phal:with_tai": ["cassini-tai"],
+        "//conditions:default": [],
+    }),
+    maintainer = "The Stratum Project",
+    homepage = "https://stratumproject.org/",
 )

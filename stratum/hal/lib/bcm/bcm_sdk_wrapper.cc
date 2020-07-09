@@ -1,18 +1,7 @@
 // Copyright 2018 Google LLC
 // Copyright 2018-present Open Networking Foundation
 // Copyright 2019 Broadcom. All rights reserved. The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "stratum/hal/lib/bcm/bcm_sdk_wrapper.h"
 
@@ -1598,6 +1587,27 @@ BcmSdkWrapper::~BcmSdkWrapper() { ShutdownAllUnits().IgnoreError(); }
     }
     RETURN_IF_BCM_ERROR(bcmlt_entry_free(entry_hdl));
   }
+  // Loopback
+  if (options.loopback_mode()) {
+    // SDKLT only supports MAC loopback mode.
+    const char* loopback;
+    if (options.loopback_mode() == LOOPBACK_STATE_NONE) {
+      loopback = PC_LPBK_NONEs;
+    } else if (options.loopback_mode() == LOOPBACK_STATE_MAC) {
+      loopback = PC_LPBK_MACs;
+    } else {
+      return MAKE_ERROR(ERR_INVALID_PARAM)
+             << "Unsupported loopback mode: "
+             << LoopbackState_Name(options.loopback_mode());
+    }
+    RETURN_IF_BCM_ERROR(bcmlt_entry_allocate(unit, PC_PORTs, &entry_hdl));
+    RETURN_IF_BCM_ERROR(bcmlt_entry_field_add(entry_hdl, PORT_IDs, port));
+    RETURN_IF_BCM_ERROR(
+        bcmlt_entry_field_symbol_add(entry_hdl, LOOPBACK_MODEs, loopback));
+    RETURN_IF_BCM_ERROR(bcmlt_custom_entry_commit(
+        entry_hdl, BCMLT_OPCODE_UPDATE, BCMLT_PRIORITY_NORMAL));
+    RETURN_IF_BCM_ERROR(bcmlt_entry_free(entry_hdl));
+  }
   return ::util::OkStatus();
 }
 
@@ -1663,6 +1673,18 @@ BcmSdkWrapper::~BcmSdkWrapper() { ShutdownAllUnits().IgnoreError(); }
       options->set_autoneg(TRI_STATE_TRUE);
     } else {
       options->set_autoneg(TRI_STATE_FALSE);
+    }
+    // Loopback status
+    const char* loopback;
+    RETURN_IF_BCM_ERROR(
+        bcmlt_entry_field_symbol_get(entry_hdl, LOOPBACK_MODEs, &loopback));
+    std::string loopback_mode(loopback);
+    if (loopback_mode == PC_LPBK_NONEs) {
+      options->set_loopback_mode(LOOPBACK_STATE_NONE);
+    } else if (loopback_mode == PC_LPBK_MACs) {
+      options->set_loopback_mode(LOOPBACK_STATE_MAC);
+    } else {
+      return MAKE_ERROR(ERR_INTERNAL) << "Unknown loopback mode " << loopback;
     }
   }
   RETURN_IF_BCM_ERROR(bcmlt_entry_free(entry_hdl));
@@ -7016,10 +7038,10 @@ namespace {
   int rule_id;
   int policy_id;
   int meter_id;
-  std::map<int, bool>* rule_ids;
-  std::map<int, bool>* policy_ids;
-  std::map<int, bool>* meter_ids;
-  std::map<int, bool>* entry_ids;
+  std::map<int, bool>* rule_ids = nullptr;
+  std::map<int, bool>* policy_ids = nullptr;
+  std::map<int, bool>* meter_ids = nullptr;
+  std::map<int, bool>* entry_ids = nullptr;
   auto *fp_rules = gtl::FindPtrOrNull(fp_rule_ids_, unit);
   auto *fp_policies = gtl::FindPtrOrNull(fp_policy_ids_, unit);
   auto *fp_meters = gtl::FindPtrOrNull(fp_meter_ids_, unit);

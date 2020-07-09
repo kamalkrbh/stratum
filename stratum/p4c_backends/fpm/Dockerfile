@@ -1,40 +1,21 @@
 #
 # Copyright 2019-present Open Networking Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# SPDX-License-Identifier: Apache-2.0
 #
 
-# This Dockerfile expects the stratum root as its scope, hence you should build
-# from root e.g.:
-# docker build -t <some tag> -f stratum/p4c_backends/fpm/Dockerfile .
+# This Dockerfile expects its containing directory as its scope with the p4c-fpm
+# Debian package present, hence you should build it like this:
+# bazel build //stratum/p4c_backends/fpm:p4c_fpm_deb
+# cp bazel-bin/stratum/p4c_backends/fpm/p4c_fpm_deb.deb stratum/p4c_backends/fpm
+# cd stratum/p4c_backends/fpm
+# docker build -t <some tag> -f Dockerfile  .
 
-# We use a 2-stage build.
-FROM stratumproject/build:build as builder
+FROM bitnami/minideb:stretch as builder
 
-# Build FPM backend
-COPY . /tmp/stratum
-WORKDIR /tmp/stratum
+RUN mkdir -p /output
+ADD ./p4c_fpm_deb.deb /
+RUN dpkg -i --instdir=/output p4c_fpm_deb.deb
 
-RUN bazel build //stratum/p4c_backends/fpm:p4c-fpm
-
-# Put aside binary and other runtime dependencies.
-RUN mkdir -p /output/usr/local/bin
-RUN install bazel-bin/stratum/p4c_backends/fpm/p4c-fpm /output/usr/local/bin/
-
-RUN mkdir -p /output/usr/share/p4c
-RUN cp -r $(bazel info output_base)/external/com_github_p4lang_p4c/p4include /output/usr/share/p4c/
-
-# Final stage, runtime.
 FROM bitnami/minideb:stretch as runtime
 
 LABEL maintainer="Stratum dev <stratum-dev@lists.stratumproject.org>"

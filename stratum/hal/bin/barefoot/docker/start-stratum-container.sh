@@ -1,43 +1,48 @@
 #!/bin/bash
-#
 # Copyright 2018-present Open Networking Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-set -e
-set -x
+# SPDX-License-Identifier: Apache-2.0
+set -ex
 
-if [ -d "/etc/onl" ]; then
-    ONLP_ARG=$(ls /lib/**/libonlp* | awk '{print "-v " $1 ":" $1 " " }')
-    ONLP_ARG="$ONLP_ARG \
-              -v /lib/platform-config:/lib/platform-config \
-              -v /etc/onl:/etc/onl"
-else
-    ONLP_ARG="--env WITH_ONLP=false"
+# Try to load the platform string if not already set.
+if [[ -z "$PLATFORM" ]] && [[ -f "/etc/onl/platform" ]]; then
+    PLATFORM=$(cat /etc/onl/platform)
+elif [[ -z "$PLATFORM" ]]; then
+    echo "PLATFORM variable must be set manually on non-ONL switches."
+    exit 255
 fi
 
-CONFIG_DIR=${CONFIG_DIR:-/root}
+# Mount ONL related directories, if they exist.
+if [ -d "/etc/onl" ]; then
+    # Use ONLP to find platform and its library
+    ONLP_MOUNT=$(ls /lib/**/libonlp* | awk '{print "-v " $1 ":" $1 " " }')
+    ONLP_MOUNT="$ONLP_MOUNT \
+              -v /lib/platform-config:/lib/platform-config \
+              -v /etc/onl:/etc/onl"
+fi
+
+if [ -n "$FLAG_FILE" ]; then
+    FLAG_FILE_MOUNT="-v $FLAG_FILE:/etc/stratum/stratum.flags"
+fi
+
+if [ -n "$CHASSIS_CONFIG" ]; then
+    CHASSIS_CONFIG_MOUNT="-v $CHASSIS_CONFIG:/etc/stratum/$PLATFORM/chassis_config.pb.txt"
+fi
+
 LOG_DIR=${LOG_DIR:-/var/log}
 SDE_VERSION=${SDE_VERSION:-9.0.0}
 KERNEL_VERSION=$(uname -r)
 DOCKER_IMAGE=${DOCKER_IMAGE:-stratumproject/stratum-bf}
 DOCKER_IMAGE_TAG=${DOCKER_IMAGE_TAG:-$SDE_VERSION-$KERNEL_VERSION}
 
-docker run -it --privileged \
+docker run -it --rm --privileged \
     -v /dev:/dev -v /sys:/sys  \
     -v /lib/modules/$(uname -r):/lib/modules/$(uname -r) \
-    $ONLP_ARG \
+    --env PLATFORM=$PLATFORM \
+    $ONLP_MOUNT \
     -p 28000:28000 \
-    -v $CONFIG_DIR:/stratum_configs \
-    -v $LOG_DIR:/stratum_logs \
-    $DOCKER_IMAGE:$DOCKER_IMAGE_TAG
+    -p 9339:9339 \
+    $FLAG_FILE_MOUNT \
+    $CHASSIS_CONFIG_MOUNT \
+    -v $LOG_DIR:/var/log/stratum \
+    $DOCKER_IMAGE:$DOCKER_IMAGE_TAG \
+    $@

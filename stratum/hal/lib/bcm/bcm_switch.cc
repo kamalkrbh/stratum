@@ -1,36 +1,24 @@
 // Copyright 2018 Google LLC
 // Copyright 2018-present Open Networking Foundation
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
+// SPDX-License-Identifier: Apache-2.0
 
 #include "stratum/hal/lib/bcm/bcm_switch.h"
 
 #include <algorithm>
 #include <map>
 #include <set>
-#include <vector>
 #include <utility>
+#include <vector>
 
-#include "stratum/glue/logging.h"
-#include "stratum/glue/status/status_macros.h"
-#include "stratum/lib/constants.h"
-#include "stratum/lib/macros.h"
-#include "stratum/glue/integral_types.h"
 #include "absl/memory/memory.h"
 #include "absl/synchronization/mutex.h"
 #include "absl/time/clock.h"
 #include "stratum/glue/gtl/map_util.h"
+#include "stratum/glue/integral_types.h"
+#include "stratum/glue/logging.h"
+#include "stratum/glue/status/status_macros.h"
+#include "stratum/lib/constants.h"
+#include "stratum/lib/macros.h"
 
 namespace stratum {
 namespace hal {
@@ -110,7 +98,7 @@ BcmSwitch::~BcmSwitch() {}
     return MAKE_ERROR(ERR_CANCELLED) << "Switch is shutdown.";
   }
   return MAKE_ERROR(ERR_UNIMPLEMENTED)
-      << "SaveForwardingPipelineConfig not implemented for this target";
+         << "SaveForwardingPipelineConfig not implemented for this target";
 }
 
 ::util::Status BcmSwitch::CommitForwardingPipelineConfig(uint64 node_id) {
@@ -119,7 +107,7 @@ BcmSwitch::~BcmSwitch() {}
     return MAKE_ERROR(ERR_CANCELLED) << "Switch is shutdown.";
   }
   return MAKE_ERROR(ERR_UNIMPLEMENTED)
-      << "CommitForwardingPipelineConfig not implemented for this target";
+         << "CommitForwardingPipelineConfig not implemented for this target";
 }
 
 ::util::Status BcmSwitch::VerifyForwardingPipelineConfig(
@@ -288,6 +276,18 @@ BcmSwitch::~BcmSwitch() {}
         }
         break;
       }
+      // Get singleton port loopback state.
+      case DataRequest::Request::kLoopbackStatus: {
+        auto loopback_state = bcm_chassis_manager_->GetPortLoopbackState(
+            req.loopback_status().node_id(), req.loopback_status().port_id());
+        if (!loopback_state.ok()) {
+          status.Update(loopback_state.status());
+        } else {
+          resp.mutable_loopback_status()->set_state(
+              loopback_state.ValueOrDie());
+        }
+        break;
+      }
       // Get configured singleton port speed in bits per second.
       case DataRequest::Request::kPortSpeed: {
         auto bcm_port = bcm_chassis_manager_->GetBcmPort(
@@ -401,12 +401,12 @@ BcmSwitch::~BcmSwitch() {}
         resp.mutable_node_packetio_debug_info()->set_debug_string(
             "A (sample) node debug string.");
         break;
-      case DataRequest::Request::kOpticalChannelInfo:
-        // Retrieve current optical channel state from phal.
+      case DataRequest::Request::kOpticalTransceiverInfo:
+        // Retrieve current optical transceiver state from phal.
         status.Update(phal_interface_->GetOpticalTransceiverInfo(
-            req.optical_channel_info().node_id(),
-            req.optical_channel_info().port_id(),
-            resp.mutable_optical_channel_info()));
+            req.optical_transceiver_info().module(),
+            req.optical_transceiver_info().network_interface(),
+            resp.mutable_optical_transceiver_info()));
         break;
       default:
         status = MAKE_ERROR(ERR_INTERNAL) << "Not supported yet!";
@@ -440,11 +440,28 @@ BcmSwitch::~BcmSwitch() {}
           case SetRequest::Request::Port::ValueCase::kLacpRouterMac:
           case SetRequest::Request::Port::ValueCase::kLacpSystemPriority:
           case SetRequest::Request::Port::ValueCase::kHealthIndicator:
+            LOG(ERROR) << "Request " << req.port().ShortDebugString()
+                       << " through SetValue() is ignored. Modify the "
+                          "ChassisConfig instead!";
             break;
-          case SetRequest::Request::Port::ValueCase::kOpticalChannelInfo: {
-            status.Update(phal_interface_->SetOpticalTransceiverInfo(
+          case SetRequest::Request::Port::ValueCase::kLoopbackStatus: {
+            absl::WriterMutexLock l(&chassis_lock);
+            status.Update(bcm_chassis_manager_->SetPortLoopbackState(
                 req.port().node_id(), req.port().port_id(),
-                req.port().optical_channel_info()));
+                req.port().loopback_status().state()));
+            break;
+          }
+          default:
+            status = MAKE_ERROR(ERR_INTERNAL) << "Not supported yet!";
+        }
+        break;
+      case SetRequest::Request::RequestCase::kOpticalNetworkInterface:
+        switch (req.optical_network_interface().value_case()) {
+          case SetRequest::Request::OpticalNetworkInterface::ValueCase::kOpticalTransceiverInfo: {  // NOLINT
+            status.Update(phal_interface_->SetOpticalTransceiverInfo(
+                req.optical_network_interface().module(),
+                req.optical_network_interface().network_interface(),
+                req.optical_network_interface().optical_transceiver_info()));
             break;
           }
           default:

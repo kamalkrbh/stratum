@@ -1,3 +1,8 @@
+<!--
+Copyright 2019-present Open Networking Foundation
+
+SPDX-License-Identifier: Apache-2.0
+-->
 Supported gNMI paths
 ====
 
@@ -112,6 +117,12 @@ Supported gNMI paths
  - Get type: ALL, STATE
  - Set mode: REPLACE, UPDATE
 
+`/interfaces/interface[name=port name]/config/loopback-mode`
+
+ - Subscription mode: ONCE, POLL, SAMPLE
+ - Get type: ALL, STATE
+ - Set mode: REPLACE, UPDATE
+
 `/interfaces/interface[name=port name]/ethernet/config/forwarding-viable`
 
  - Subscription mode: ONCE, POLL, SAMPLE
@@ -180,6 +191,12 @@ Supported gNMI paths
  - Get type: ALL, STATE
  - Set mode: Not valid
 
+`/interfaces/interface[name=port name]/state/loopback-mode`
+
+ - Subscription mode: ONCE, POLL, SAMPLE, ON_CHANGE
+ - Get type: ALL, STATE
+ - Set mode: Not valid
+
 `/interfaces/interface[name=port name]/state/ifindex`
 
  - Subscription mode: ONCE, POLL, SAMPLE
@@ -221,31 +238,31 @@ Supported gNMI paths
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
-  
+
 `/interfaces/interface[name=port name]/state/counters/in-discards`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
-    
+
 `/interfaces/interface[name=port name]/state/counters/in-errors`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
-  
+
 `/interfaces/interface[name=port name]/state/counters/in-fcs-errors`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
-  
+
 `/interfaces/interface[name=port name]/state/counters/in-multicast-pkts`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
-  
+
 `/interfaces/interface[name=port name]/state/counters/in-octets`
 
  - Subscription mode: ONCE, POLL, SAMPLE
@@ -257,43 +274,43 @@ Supported gNMI paths
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
-    
+
 `/interfaces/interface[name=port name]/state/counters/in-unknown-protos`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
-  
+
 `/interfaces/interface[name=port name]/state/counters/out-broadcast-pkts`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
- 
+
 `/interfaces/interface[name=port name]/state/counters/out-discards`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
-   
+
 `/interfaces/interface[name=port name]/state/counters/out-errors`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
- 
+
 `/interfaces/interface[name=port name]/state/counters/out-multicast-pkts`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
- 
+
 `/interfaces/interface[name=port name]/state/counters/out-octets`
 
  - Subscription mode: ONCE, POLL, SAMPLE
  - Get type: ALL, STATE
  - Set mode: Not valid
- 
+
 `/interfaces/interface[name=port name]/state/counters/out-unicast-pkts`
 
  - Subscription mode: ONCE, POLL, SAMPLE

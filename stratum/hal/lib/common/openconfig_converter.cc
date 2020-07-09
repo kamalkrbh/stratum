@@ -1,17 +1,6 @@
 // Copyright 2018 Google LLC
 // Copyright 2018-present Open Networking Foundation
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "stratum/hal/lib/common/openconfig_converter.h"
 
@@ -311,6 +300,13 @@ SingletonPortToInterfaces(const SingletonPort &in) {
   // -> /interfaces/interface/ethernet/config/auto-negotiate
   interface->mutable_ethernet()->mutable_auto_negotiate()->set_value(
       IsPortAutonegEnabled(in.config_params().autoneg()));
+
+  // SingletonPort.config_params.loopback_mode
+  // -> /interfaces/interface/config/loopback-mode
+  if (in.config_params().loopback_mode() != LOOPBACK_STATE_UNKNOWN) {
+    interface->mutable_loopback_mode()->set_value(
+        IsLoopbackStateEnabled(in.config_params().loopback_mode()));
+  }
 
   // FIXME(Yi Tseng): Should we use other field to store interface channel?
   interface->add_physical_channel()->set_value(in.channel());
@@ -702,6 +698,12 @@ TrunkPortToInterfaces(const ChassisConfig &root, const TrunkPort &in) {
     case OPENCONFIGPLATFORMTYPESFECMODETYPE_FEC_AUTO:
       config_params->set_fec_mode(FEC_MODE_AUTO);
       break;
+  }
+
+  if (interface.has_loopback_mode()) {
+    LoopbackState lpbk_mode = interface.loopback_mode().value() ?
+        LOOPBACK_STATE_MAC : LOOPBACK_STATE_NONE;
+    config_params->set_loopback_mode(lpbk_mode);
   }
 
   // FIXME(Yi Tseng): Should we use other field to store interface channel?

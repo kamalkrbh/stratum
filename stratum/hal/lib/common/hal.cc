@@ -1,17 +1,6 @@
 // Copyright 2018 Google LLC
 // Copyright 2018-present Open Networking Foundation
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 
 #include "stratum/hal/lib/common/hal.h"
@@ -32,7 +21,7 @@
 #include "absl/synchronization/mutex.h"
 
 // TODO(unknown): Use FLAG_DEFINE for all flags.
-DEFINE_string(external_stratum_urls, "",
+DEFINE_string(external_stratum_urls, stratum::kExternalStratumUrls,
             "Comma-separated list of URLs for server to listen to for external"
             " calls from SDN controller, etc.");
 DEFINE_string(local_stratum_url, stratum::kLocalStratumUrl,
@@ -40,7 +29,7 @@ DEFINE_string(local_stratum_url, stratum::kLocalStratumUrl,
 DEFINE_bool(warmboot, false, "Determines whether HAL is in warmboot stage.");
 DEFINE_string(procmon_service_addr, ::stratum::kProcmonServiceUrl,
               "URL of the procmon service to connect to.");
-DEFINE_string(persistent_config_dir, "",
+DEFINE_string(persistent_config_dir, "/etc/stratum/",
               "The persistent dir where all the config files will be stored.");
 DEFINE_int32(grpc_keepalive_time_ms, 600000, "grpc keep alive time");
 DEFINE_int32(grpc_keepalive_timeout_ms, 20000,
@@ -48,7 +37,7 @@ DEFINE_int32(grpc_keepalive_timeout_ms, 20000,
 DEFINE_int32(grpc_keepalive_min_ping_interval, 10000,
              "grpc keep alive minimum ping interval");
 DEFINE_int32(grpc_keepalive_permit, 1, "grpc keep alive permit");
-DEFINE_uint32(grpc_max_recv_msg_size, 0,
+DEFINE_uint32(grpc_max_recv_msg_size, 256,
               "grpc server max receive message size in MB");
 DEFINE_uint32(grpc_max_send_msg_size, 0,
               "grpc server max send message size in MB");

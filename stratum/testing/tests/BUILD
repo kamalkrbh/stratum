@@ -1,28 +1,16 @@
-#
 # Copyright 2018 Google LLC
 # Copyright 2018-present Open Networking Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# SPDX-License-Identifier: Apache-2.0
 
-licenses(["notice"])  # Apache v2
-
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load(
     "//bazel:rules.bzl",
+    "HOST_ARCHES",
     "STRATUM_INTERNAL",
     "stratum_cc_library",
-    "HOST_ARCHES",
 )
+
+licenses(["notice"])  # Apache v2
 
 package(
     #default_hdrs_check = "strict",
@@ -44,7 +32,6 @@ cc_library(
         "//stratum/testing/protos:bcm_sim_test_protos",
     ],
     deps = [
-        "@com_github_google_glog//:glog",
         "//devtools/build/runtime:get_runfiles_dir",
         "//stratum/hal/lib/bcm:bcm_acl_manager",
         "//stratum/hal/lib/bcm:bcm_chassis_manager",
@@ -63,10 +50,11 @@ cc_library(
         "//stratum/lib:macros",
         "//stratum/lib:utils",
         "//stratum/lib/test_utils:matchers",
-        "@com_google_googletest//:gtest",
+        "@com_github_google_glog//:glog",
+        "@com_github_p4lang_p4runtime//:p4runtime_cc_grpc",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/synchronization",
-        "@com_github_p4lang_p4runtime//:p4runtime_cc_grpc",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -76,9 +64,9 @@ stratum_cc_library(
     srcs = ["test_main.cc"],
     arches = HOST_ARCHES,
     deps = [
-        "@com_github_google_glog//:glog",
         "//stratum/glue:init_google",
         "//stratum/glue:logging",
+        "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest",
     ],
 )
@@ -98,8 +86,8 @@ cc_test(
         "//stratum/hal/lib/common:writer_interface",
         "//stratum/lib:macros",
         "//stratum/lib/test_utils:matchers",
-        "@com_google_googletest//:gtest",
-        "@com_google_absl//absl/strings",
         "@com_github_p4lang_p4runtime//:p4runtime_cc_grpc",
+        "@com_google_absl//absl/strings",
+        "@com_google_googletest//:gtest",
     ],
 )

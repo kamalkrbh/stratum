@@ -1,17 +1,6 @@
 // Copyright 2018 Google LLC
 // Copyright 2018-present Open Networking Foundation
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 
 #include "stratum/hal/lib/common/p4_service.h"
@@ -39,17 +28,16 @@
 #include "stratum/glue/gtl/cleanup.h"
 #include "stratum/glue/gtl/map_util.h"
 
-DEFINE_string(forwarding_pipeline_configs_file, "",
+DEFINE_string(forwarding_pipeline_configs_file,
+              "/var/run/stratum/pipeline_cfg.pb.txt",
               "The latest set of verified ForwardingPipelineConfig protos "
               "pushed to the switch. This file is updated whenever "
               "ForwardingPipelineConfig proto for switching node is added or "
-              "modified. Default is empty and it is expected to be explicitly "
-              "given by flags.");
-DEFINE_string(write_req_log_file, "",
+              "modified.");
+DEFINE_string(write_req_log_file, "/var/log/stratum/p4_writes.pb.txt",
               "The log file for all the individual write request updates and "
               "the corresponding result. The format for each line is: "
-              "<timestamp>;<node_id>;<update proto>;<status>.  Default is "
-              "empty and it is expected to be explicitly given by flags.");
+              "<timestamp>;<node_id>;<update proto>;<status>.");
 DEFINE_int32(max_num_controllers_per_node, 5,
              "Max number of controllers that can manage a node.");
 DEFINE_int32(max_num_controller_connections, 20,

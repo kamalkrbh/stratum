@@ -1,3 +1,5 @@
+// Copyright 2019-present Open Networking Foundation
+// SPDX-License-Identifier: Apache-2.0
 module openconfig-interfaces-stratum {
 
     yang-version "1";
@@ -33,11 +35,6 @@ module openconfig-interfaces-stratum {
 
     deviation "/oc-if:interfaces/oc-if:interface/oc-if:config/oc-if:mtu" {
         description "Stratum does not support interface/config/mtu";
-        deviate not-supported;
-    }
-
-    deviation "/oc-if:interfaces/oc-if:interface/oc-if:config/oc-if:loopback-mode" {
-        description "Stratum does not support interface/config/loopback-mode";
         deviate not-supported;
     }
 

@@ -1,19 +1,6 @@
-/*
- * Copyright 2018 Google LLC
- * Copyright 2018-present Open Networking Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2018 Google LLC
+// Copyright 2018-present Open Networking Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 
 #ifndef STRATUM_HAL_LIB_COMMON_PHAL_INTERFACE_H_
@@ -124,17 +111,21 @@ class PhalInterface {
   virtual ::util::Status GetFrontPanelPortInfo(
       int slot, int port, FrontPanelPortInfo* fp_port_info) = 0;
 
-  // Gets the information about the optical transceiver module for the given
-  // (slot, port). This method is expected to return error if there is no
-  // related optics module inserted in the given (slot, port) yet.
+  // Gets the information about the optical network interface for the given
+  // (module, network_interface). This method is expected to return error if
+  // there is no related optics module inserted in the
+  // given (module, network_interface) yet.
   virtual ::util::Status GetOpticalTransceiverInfo(
-      int slot, int port, OpticalChannelInfo* oc_info) = 0;
+      int module, int network_interface,
+      OpticalTransceiverInfo* optical_netif_info) = 0;
 
-  // Sets the data from oc_info into the optical transceiver module for the
-  // given (slot, port). This method is expected to return error if there is no
-  // related optics module inserted yet.
+  // Sets the data from optical_netif_info into the optical transceiver module
+  // for the given (module, network_interface). This method is expected to
+  // return error if there is no related optics module or network interface
+  // inserted yet.
   virtual ::util::Status SetOpticalTransceiverInfo(
-      int slot, int port, const OpticalChannelInfo& oc_info) = 0;
+      int module, int network_interface,
+      const OpticalTransceiverInfo& optical_netif_info) = 0;
 
   // Set the color/state of a frontpanel port LED, corresponding to the physical
   // port specified by (slot, port, channel). The caller assumes each physical

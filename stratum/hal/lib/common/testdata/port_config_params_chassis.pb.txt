@@ -1,3 +1,5 @@
+# Copyright 2019-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
 chassis {
   name: "dummy switch 1"
 }
@@ -25,5 +27,6 @@ singleton_ports {
     autoneg: TRI_STATE_TRUE
     fec_mode: FEC_MODE_ON
     admin_state: ADMIN_STATE_ENABLED
+    loopback_mode: LOOPBACK_STATE_MAC
   }
 }

@@ -1,19 +1,6 @@
-#
 # Copyright 2018 Google LLC
 # Copyright 2018-present Open Networking Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# SPDX-License-Identifier: Apache-2.0
 
 licenses(["notice"])  # Apache v2
 
@@ -27,6 +14,8 @@ load(
     "//stratum/p4c_backends/test:build_defs.bzl",
     "p4c_save_ir",
 )
+
+load("@rules_pkg//:pkg.bzl", "pkg_tar", "pkg_deb")
 
 package(
     # default_copts = [
@@ -1914,6 +1903,43 @@ cc_binary(
         "//stratum/p4c_backends/fpm/bcm:bcm_target_info",
         "//stratum/p4c_backends/fpm/bcm:bcm_tunnel_optimizer",
     ],
+)
+
+pkg_tar(
+    name = "fpm_p4c_bin",
+    strip_prefix = "/stratum/p4c_backends/fpm",
+    package_dir = "/usr/bin",
+    srcs = [":p4c-fpm"],
+    mode = "0755",
+)
+
+pkg_tar(
+    name = "fpm_p4c_includes",
+    strip_prefix = "/external/com_github_p4lang_p4c",
+    package_dir = "/usr/share/p4c/",
+    srcs = [
+        "@com_github_p4lang_p4c//:p4include/v1model.p4",
+        "@com_github_p4lang_p4c//:p4include/core.p4",
+    ],
+    mode = "0644",
+)
+
+pkg_tar(
+    name = "fpm_p4c_data",
+    deps = [
+        ":fpm_p4c_bin",
+        ":fpm_p4c_includes",
+    ],
+)
+
+pkg_deb(
+    name = "p4c_fpm_deb",
+    package = "p4-fpm",
+    version = "0.1",
+    description = "P4 compiler for FPM",
+    architecture = "amd64",
+    data = ":fpm_p4c_data",
+    maintainer = "https://stratumproject.org/",
 )
 
 filegroup(

@@ -1,16 +1,5 @@
 // Copyright 2018-present Open Networking Foundation
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "stratum/hal/lib/dummy/dummy_switch.h"
 
@@ -282,6 +271,16 @@ namespace dummy_switch {
         ::util::Status status =
             phal_interface_->GetFrontPanelPortInfo(slot, port,
                                   resp_val.mutable_front_panel_port_info());
+        if (status.ok()) {
+          resp = resp_val;
+        }
+        break;
+      }
+      case DataRequest::Request::kOpticalTransceiverInfo: {
+        ::util::Status status = phal_interface_->GetOpticalTransceiverInfo(
+            request.optical_transceiver_info().module(),
+            request.optical_transceiver_info().network_interface(),
+            resp_val.mutable_optical_transceiver_info());
         if (status.ok()) {
           resp = resp_val;
         }

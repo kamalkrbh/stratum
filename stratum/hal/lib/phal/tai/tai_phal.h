@@ -1,18 +1,5 @@
-/*
- * Copyright 2020-present Open Networking Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2020-present Open Networking Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 #ifndef STRATUM_HAL_LIB_PHAL_TAI_TAI_PHAL_H_
 #define STRATUM_HAL_LIB_PHAL_TAI_TAI_PHAL_H_
@@ -26,6 +13,7 @@
 #include "absl/synchronization/mutex.h"
 #include "stratum/hal/lib/phal/attribute_database.h"
 #include "stratum/hal/lib/phal/phal_backend_interface.h"
+#include "stratum/hal/lib/phal/tai/tai_interface.h"
 
 namespace stratum {
 namespace hal {
@@ -47,15 +35,17 @@ class TaiPhal final : public PhalBackendInterface {
 
   // Creates the singleton instance. Expected to be called once to initialize
   // the instance.
-  static TaiPhal* CreateSingleton() LOCKS_EXCLUDED(config_lock_, init_lock_);
+  static TaiPhal* CreateSingleton(TaiInterface* tai_interface)
+      LOCKS_EXCLUDED(config_lock_, init_lock_);
 
   // TaiPhal is neither copyable nor movable.
   TaiPhal(const TaiPhal&) = delete;
   TaiPhal& operator=(const TaiPhal&) = delete;
+  TaiPhal() = delete;
 
  private:
   // Private constructor.
-  TaiPhal();
+  explicit TaiPhal(TaiInterface* tai_interface);
 
   // Calls all the one time start initializations.
   ::util::Status Initialize() LOCKS_EXCLUDED(config_lock_);
@@ -74,6 +64,10 @@ class TaiPhal final : public PhalBackendInterface {
 
   // Determines if PHAL is fully initialized.
   bool initialized_ GUARDED_BY(config_lock_) = false;
+
+  // The pointer for TaiInterface that allows TaiPhal to access TAI specific
+  // features, for example, listen events from TAI.
+  TaiInterface* tai_interface_;
 };
 
 }  // namespace tai

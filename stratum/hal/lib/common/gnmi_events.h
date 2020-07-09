@@ -1,19 +1,6 @@
-/*
- * Copyright 2018 Google LLC
- * Copyright 2018-present Open Networking Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2018 Google LLC
+// Copyright 2018-present Open Networking Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 
 #ifndef STRATUM_HAL_LIB_COMMON_GNMI_EVENTS_H_
@@ -153,6 +140,21 @@ class PerPortGnmiEvent : public PerNodeGnmiEvent<E> {
   uint32 port_id_;
 };
 
+template <typename E>
+class PerOpticalPortGnmiEvent : public GnmiEventProcess<E> {
+ public:
+  explicit PerOpticalPortGnmiEvent(int32 module, int32 network_interface) :
+      module_(module), network_interface_(network_interface) {}
+  ~PerOpticalPortGnmiEvent() override {}
+
+  int32 GetModule() const { return module_; }
+  int32 GetNetworkInterface() const { return network_interface_; }
+
+ private:
+  int32 module_;
+  int32 network_interface_;
+};
+
 // A Port's Operational State Has Changed event.
 class PortOperStateChangedEvent
     : public PerPortGnmiEvent<PortOperStateChangedEvent> {
@@ -181,6 +183,21 @@ class PortAdminStateChangedEvent
 
  private:
   AdminState new_state_;
+};
+
+// A Port's Loopback State Has Changed event.
+class PortLoopbackStateChangedEvent
+    : public PerPortGnmiEvent<PortLoopbackStateChangedEvent> {
+ public:
+  PortLoopbackStateChangedEvent(uint64 node_id, uint32 port_id,
+                                const LoopbackState& new_state)
+      : PerPortGnmiEvent(node_id, port_id), new_state_(new_state) {}
+  ~PortLoopbackStateChangedEvent() override {}
+
+  LoopbackState GetNewState() const { return new_state_; }
+
+ private:
+  LoopbackState new_state_;
 };
 
 // A Port's Speed expressed in Bits Per Second Has Changed event.
@@ -367,29 +384,15 @@ class PortAutonegChangedEvent
   const TriState new_state_;
 };
 
-// Port frequency changed event.
-class PortFrequencyChangedEvent
-    : public PerPortGnmiEvent<PortFrequencyChangedEvent> {
+// Optical network interface input power changed event.
+class OpticalInputPowerChangedEvent
+    : public PerOpticalPortGnmiEvent<OpticalInputPowerChangedEvent> {
  public:
-  PortFrequencyChangedEvent(uint64 node_id, uint32 port_id,
-                            uint64 new_frequency)
-      : PerPortGnmiEvent(node_id, port_id), new_frequency_(new_frequency) {}
-  ~PortFrequencyChangedEvent() override {}
-
-  uint64 GetFrequency() const { return new_frequency_; }
-
- private:
-  const uint64 new_frequency_;
-};
-
-// Port input power changed event.
-class PortInputPowerChangedEvent
-    : public PerPortGnmiEvent<PortInputPowerChangedEvent> {
- public:
-  PortInputPowerChangedEvent(uint64 node_id, uint32 port_id,
-                             const OpticalChannelInfo::Power new_input_power)
-      : PerPortGnmiEvent(node_id, port_id), new_input_power_(new_input_power) {}
-  ~PortInputPowerChangedEvent() override {}
+  OpticalInputPowerChangedEvent(int32 module, int32 network_interface,
+                                const OpticalTransceiverInfo::Power power)
+      : PerOpticalPortGnmiEvent(module, network_interface),
+        new_input_power_(power) {}
+  ~OpticalInputPowerChangedEvent() override {}
 
   // Actual power values.
   double GetInstant() const { return new_input_power_.instant(); }
@@ -403,34 +406,18 @@ class PortInputPowerChangedEvent
   uint64 GetMaxTime() const { return new_input_power_.max_time(); }
 
  private:
-  const OpticalChannelInfo::Power new_input_power_;
+  const OpticalTransceiverInfo::Power new_input_power_;
 };
 
-// Port target output power changed event.
-class PortTargetOutputPowerChangedEvent
-    : public PerPortGnmiEvent<PortTargetOutputPowerChangedEvent> {
+// Optical network interface output power changed event.
+class OpticalOutputPowerChangedEvent
+    : public PerOpticalPortGnmiEvent<OpticalOutputPowerChangedEvent> {
  public:
-  PortTargetOutputPowerChangedEvent(uint64 node_id, uint32 port_id,
-                                    double new_target_output_power)
-      : PerPortGnmiEvent(node_id, port_id),
-        new_target_output_power_(new_target_output_power) {}
-  ~PortTargetOutputPowerChangedEvent() override {}
-
-  double GetPower() const { return new_target_output_power_; }
-
- private:
-  const double new_target_output_power_;
-};
-
-// Port output power changed event.
-class PortOutputPowerChangedEvent
-    : public PerPortGnmiEvent<PortOutputPowerChangedEvent> {
- public:
-  PortOutputPowerChangedEvent(uint64 node_id, uint32 port_id,
-                              const OpticalChannelInfo::Power new_output_power)
-      : PerPortGnmiEvent(node_id, port_id),
-        new_output_power_(new_output_power) {}
-  ~PortOutputPowerChangedEvent() override {}
+  OpticalOutputPowerChangedEvent(int32 module, int32 network_interface,
+                                 const OpticalTransceiverInfo::Power power)
+      : PerOpticalPortGnmiEvent(module, network_interface),
+        new_output_power_(power) {}
+  ~OpticalOutputPowerChangedEvent() override {}
 
   // Actual power values.
   double GetInstant() const { return new_output_power_.instant(); }
@@ -444,38 +431,7 @@ class PortOutputPowerChangedEvent
   uint64 GetMaxTime() const { return new_output_power_.max_time(); }
 
  private:
-  const OpticalChannelInfo::Power new_output_power_;
-};
-
-// Port operational mode changed event.
-class PortOperationalModeChangedEvent
-    : public PerPortGnmiEvent<PortOperationalModeChangedEvent> {
- public:
-  PortOperationalModeChangedEvent(uint64 node_id, uint32 port_id,
-                                  uint64 new_operational_mode)
-      : PerPortGnmiEvent(node_id, port_id),
-        new_operational_mode_(new_operational_mode) {}
-  ~PortOperationalModeChangedEvent() override {}
-
-  uint64 GetOperationalMode() const { return new_operational_mode_; }
-
- private:
-  const uint64 new_operational_mode_;
-};
-
-// Port "line port" changed event.
-class PortLinePortChangedEvent
-    : public PerPortGnmiEvent<PortLinePortChangedEvent> {
- public:
-  PortLinePortChangedEvent(uint64 node_id, uint32 port_id,
-                           const std::string& new_line_port)
-      : PerPortGnmiEvent(node_id, port_id), new_line_port_(new_line_port) {}
-  ~PortLinePortChangedEvent() override {}
-
-  const std::string& GetLinePort() const { return new_line_port_; }
-
- private:
-  const std::string new_line_port_;
+  const OpticalTransceiverInfo::Power new_output_power_;
 };
 
 // Configuration Has Been Pushed event.

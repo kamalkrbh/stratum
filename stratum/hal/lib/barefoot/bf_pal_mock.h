@@ -1,17 +1,5 @@
-/* Copyright 2019-present Barefoot Networks, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2019-present Barefoot Networks, Inc.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <memory>
 
@@ -58,6 +46,9 @@ class BFPalMock : public BFPalInterface {
                ::util::Status(int unit, uint32 port_id, int32 mtu));
 
   MOCK_METHOD2(PortIsValid, bool(int unit, uint32 port_id));
+  MOCK_METHOD3(PortLoopbackModeSet,
+               ::util::Status(int uint, uint32 port_id,
+               LoopbackState loopback_mode));
 };
 
 }  // namespace barefoot

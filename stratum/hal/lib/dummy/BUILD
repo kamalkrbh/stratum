@@ -1,18 +1,5 @@
-#
-# Copyright 2018-present Open Networking Foundation.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# Copyright 2018-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
 
 licenses(["notice"])  # Apache v2
 
@@ -24,7 +11,7 @@ load(
     "HOST_ARCHES",
 )
 load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
-load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_proto_library", "py_grpc_library")
 
 package(
     default_visibility = STRATUM_INTERNAL,
@@ -52,21 +39,6 @@ stratum_cc_library(
             "//stratum/hal/lib/common:writer_interface",
             "//stratum/hal/lib/common:common_cc_proto",
             "//stratum/public/lib:error",
-            ":dummy_box",
-            ":dummy_global_vars",
-    ]
-)
-
-stratum_cc_library(
-    name = "dummy_phal",
-    srcs = ["dummy_phal.cc"],
-    hdrs = ["dummy_phal.h"],
-    deps = ["@com_google_absl//absl/synchronization",
-            "//stratum/glue:logging",
-            "//stratum/glue:integral_types",
-            "//stratum/hal/lib/common:writer_interface",
-            "//stratum/hal/lib/common:phal_interface",
-            "//stratum/hal/lib/common:constants",
             ":dummy_box",
             ":dummy_global_vars",
     ]
@@ -118,10 +90,14 @@ cc_grpc_library(
 )
 
 py_proto_library(
+    name = "dummy_test_py_proto",
+    deps = [":dummy_test_proto"],
+)
+
+py_grpc_library(
     name = "dummy_test_py_grpc",
-    deps = [
-        ":dummy_test_proto"
-    ],
+    srcs = [":dummy_test_proto"],
+    deps = [":dummy_test_py_proto"],
 )
 
 stratum_cc_library(

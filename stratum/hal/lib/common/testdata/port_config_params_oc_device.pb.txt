@@ -1,3 +1,5 @@
+# Copyright 2019-present Open Networking Foundation
+# SPDX-License-Identifier: Apache-2.0
 component {
   name: "dummy switch 1"
   component {
@@ -62,6 +64,9 @@ interface {
       auto_negotiate {
         value: true
       }
+    }
+    loopback_mode: {
+      value: true
     }
     id {
       value: 1

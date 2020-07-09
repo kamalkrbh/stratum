@@ -1,22 +1,9 @@
-#
 # Copyright 2018-present Open Networking Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# SPDX-License-Identifier: Apache-2.0
 
-ARG BAZEL_VERSION=2.2.0
-ARG PI_COMMIT=1539ecd8a50c159b011d9c5a9c0eba99f122a845
-ARG BMV2_COMMIT=9ef324838b29419040b4f677a3ff65bc72405c44
+ARG BAZEL_VERSION=3.3.0
+ARG PI_COMMIT=0fbdac256151eb1537cd5ebf19101d5df60767fa
+ARG BMV2_COMMIT=498202d98d83a6c580aa86a3497b9b496bcd43b2
 ARG JDK_URL=https://mirror.bazel.build/openjdk/azul-zulu11.29.3-ca-jdk11.0.2/zulu11.29.3-ca-jdk11.0.2-linux_x64.tar.gz
 ARG LLVM_REPO_NAME="deb http://apt.llvm.org/stretch/  llvm-toolchain-stretch main"
 
@@ -35,13 +22,15 @@ ARG JOBS
 # LLVM dependencies
 # + gnupg2 for apt-key
 # + software-properties-common for add-apt-repository
+# OpenNSA dependencies
+# + libelf-dev to build the kernel modules
 ENV PKG_DEPS pkg-config zip zlib1g-dev unzip python wget ca-certificates \
     ssh git gdb vim emacs-nox sudo libudev-dev libjudy-dev bison flex \
     libfl-dev libgmp-dev libi2c-dev python-yaml libyaml-dev build-essential \
     lcov curl autoconf automake libtool libgmp-dev libpcap-dev \
     libboost-thread-dev libboost-filesystem-dev libboost-program-options-dev \
     gnupg2 software-properties-common python-pip python-dev python3-dev \
-    apt-transport-https
+    apt-transport-https libelf-dev libbz2-dev
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends $PKG_DEPS
@@ -91,6 +80,21 @@ RUN git clone https://github.com/p4lang/behavioral-model.git /tmp/bmv2 && \
     make -j${JOBS} && make install && ldconfig && \
     rm -rf /tmp/bmv2
 
-# Tools for style checking
+# Tools for style and license checking
 RUN pip install setuptools wheel && \
-    pip install cpplint
+    pip install 'cpplint==1.*'
+RUN wget -O /usr/local/bin/buildifier https://github.com/bazelbuild/buildtools/releases/download/3.2.1/buildifier
+RUN chmod +x /usr/local/bin/buildifier
+
+# Docker CLI for CI builds
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+RUN add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) \
+   stable"
+RUN apt-get update && apt-get install -y --no-install-recommends docker-ce-cli
+
+# Install git-lfs for OpenNSA
+# TODO the curl line can be dropped in Debian 10
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+RUN apt-get install -y --no-install-recommends git-lfs && git lfs install

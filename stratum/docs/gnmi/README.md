@@ -1,3 +1,9 @@
+<!--
+Copyright 2018-present Open Networking Foundation
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 Config Monitoring Service (gNMI)
 ====
 
@@ -215,3 +221,9 @@ Supported paths
 ----
 
 See [supported-paths](supported-paths.md)
+
+OpenConfig Model
+----
+
+For an overview of the complete OpenConfig tree, have a look at the interactive
+[HTML](http://ops.openconfig.net/branches/models/master/) version.

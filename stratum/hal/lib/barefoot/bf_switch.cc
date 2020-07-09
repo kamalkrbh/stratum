@@ -1,17 +1,5 @@
-/* Copyright 2018-present Barefoot Networks, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2018-present Barefoot Networks, Inc.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "stratum/hal/lib/barefoot/bf_switch.h"
 
@@ -38,9 +26,11 @@ namespace barefoot {
 
 BFSwitch::BFSwitch(PhalInterface* phal_interface,
                    BFChassisManager* bf_chassis_manager,
+                   BFPdInterface* bf_pd_interface,
                    const std::map<int, PINode*>& unit_to_pi_node)
-    : phal_interface_(CHECK_NOTNULL(phal_interface)),
-      bf_chassis_manager_(CHECK_NOTNULL(bf_chassis_manager)),
+    : phal_interface_(ABSL_DIE_IF_NULL(phal_interface)),
+      bf_chassis_manager_(ABSL_DIE_IF_NULL(bf_chassis_manager)),
+      bf_pd_interface_(ABSL_DIE_IF_NULL(bf_pd_interface)),
       unit_to_pi_node_(unit_to_pi_node),
       node_id_to_pi_node_() {
   for (const auto& entry : unit_to_pi_node_) {
@@ -87,6 +77,14 @@ BFSwitch::~BFSwitch() {}
   LOG(INFO) << "P4-based forwarding pipeline config pushed successfully to "
             << "node with ID " << node_id << ".";
 
+  ASSIGN_OR_RETURN(const auto& node_id_to_unit,
+                   bf_chassis_manager_->GetNodeIdToUnitMap());
+
+  CHECK_RETURN_IF_FALSE(gtl::ContainsKey(node_id_to_unit, node_id))
+      << "Unable to find unit number for node " << node_id;
+  int unit = gtl::FindOrDie(node_id_to_unit, node_id);
+  ASSIGN_OR_RETURN(auto cpu_port, bf_pd_interface_->GetPcieCpuPort(unit));
+  RETURN_IF_ERROR(bf_pd_interface_->SetTmCpuPort(unit, cpu_port));
   return ::util::OkStatus();
 }
 
@@ -198,6 +196,7 @@ BFSwitch::~BFSwitch() {}
       case DataRequest::Request::kPortCounters:
       case DataRequest::Request::kAutonegStatus:
       case DataRequest::Request::kFrontPanelPortInfo:
+      case DataRequest::Request::kLoopbackStatus:
         resp = bf_chassis_manager_->GetPortData(req);
         break;
       default:
@@ -232,9 +231,11 @@ BFSwitch::~BFSwitch() {}
 std::unique_ptr<BFSwitch> BFSwitch::CreateInstance(
     PhalInterface* phal_interface,
     BFChassisManager* bf_chassis_manager,
+    BFPdInterface* bf_pd_interface,
     const std::map<int, PINode*>& unit_to_pi_node) {
   return absl::WrapUnique(
-      new BFSwitch(phal_interface, bf_chassis_manager, unit_to_pi_node));
+      new BFSwitch(phal_interface, bf_chassis_manager, bf_pd_interface,
+                   unit_to_pi_node));
 }
 
 ::util::StatusOr<PINode*> BFSwitch::GetPINodeFromUnit(int unit) const {

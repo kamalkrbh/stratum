@@ -1,17 +1,6 @@
 // Copyright 2018 Google LLC
 // Copyright 2018-present Open Networking Foundation
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// SPDX-License-Identifier: Apache-2.0
 
 
 #include "stratum/hal/lib/common/utils.h"
@@ -359,6 +348,16 @@ bool IsAdminStateEnabled(const AdminState& admin_state) {
     return admin_state == AdminState::ADMIN_STATE_ENABLED;
 }
 
+bool IsLoopbackStateEnabled(const LoopbackState& loopback_state) {
+  switch (loopback_state) {
+    case LOOPBACK_STATE_MAC:
+    case LOOPBACK_STATE_PHY:
+      return true;
+    default:
+      return false;
+  }
+}
+
 std::string ConvertMediaTypeToString(const MediaType& type) {
   switch (type) {
     case MEDIA_TYPE_SFP:
@@ -430,6 +429,14 @@ std::string ConvertHwStateToPresentString(const HwState& hw_state) {
   auto status = ConvertDoubleToDecimal64(value);
   CHECK(status.ok());
   return status.ConsumeValueOrDie();
+}
+
+uint64 ConvertHzToMHz(const uint64& val) {
+  return val / 1000000;
+}
+
+uint64 ConvertMHzToHz(const uint64& val) {
+  return val * 1000000;
 }
 
 }  // namespace hal

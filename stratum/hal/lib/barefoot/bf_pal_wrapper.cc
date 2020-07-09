@@ -1,17 +1,5 @@
-/* Copyright 2019-present Barefoot Networks, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2019-present Barefoot Networks, Inc.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "stratum/hal/lib/barefoot/bf_pal_wrapper.h"
 
@@ -194,6 +182,19 @@ namespace {
   RETURN_ERROR(ERR_INVALID_PARAM) << "Invalid FEC mode.";
 }
 
+::util::StatusOr<bf_loopback_mode_e>
+LoopbackModeToBf(LoopbackState loopback_mode) {
+  switch (loopback_mode) {
+    case LOOPBACK_STATE_NONE:
+      return BF_LPBK_NONE;
+    case LOOPBACK_STATE_MAC:
+      return BF_LPBK_MAC_NEAR;
+    default:
+      RETURN_ERROR(ERR_INVALID_PARAM) << "Unsupported loopback mode: "
+          << LoopbackState_Name(loopback_mode) << ".";
+  }
+}
+
 }  // namespace
 
 ::util::Status BFPalWrapper::PortAdd(
@@ -274,6 +275,25 @@ namespace {
 
 bool BFPalWrapper::PortIsValid(int unit, uint32 port_id) {
   return (bf_pal_port_is_valid(unit, port_id) == BF_SUCCESS);
+}
+
+::util::Status BFPalWrapper::PortLoopbackModeSet(int unit, uint32 port_id,
+                                                 LoopbackState loopback_mode) {
+  if (loopback_mode == LOOPBACK_STATE_UNKNOWN) {
+    // Do nothing if we try to set loopback mode to the default one (UNKNOWN).
+    return ::util::OkStatus();
+  }
+  ASSIGN_OR_RETURN(bf_loopback_mode_e lp_mode, LoopbackModeToBf(loopback_mode));
+  auto bf_status =
+      bf_pal_port_loopback_mode_set(static_cast<bf_dev_id_t>(unit),
+                                    static_cast<bf_dev_port_t>(port_id),
+                                    lp_mode);
+  if (bf_status != BF_SUCCESS) {
+    return MAKE_ERROR(ERR_INTERNAL)
+        << "Error when setting loopback mode on dev " << unit << " port "
+        << port_id << ".";
+  }
+  return ::util::OkStatus();
 }
 
 BFPalWrapper::BFPalWrapper()

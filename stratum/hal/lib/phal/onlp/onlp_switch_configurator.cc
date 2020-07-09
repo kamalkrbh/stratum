@@ -1,17 +1,6 @@
 // Copyright 2019 Dell EMC
-// Copyright 2020 Open Networking Foundation
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright 2020-present Open Networking Foundation
+// SPDX-License-Identifier: Apache-2.0
 
 #include "stratum/hal/lib/phal/onlp/onlp_switch_configurator.h"
 
@@ -65,6 +54,7 @@ OnlpSwitchConfigurator::Make(OnlpPhalInterface* phal_interface,
     port.set_port(ONLP_OID_ID_GET(oid));
     // See if we've got an sfp type and set the physical port type
     switch (sfp_info.GetSfpType()) {
+      case SFP_TYPE_SFP28:
       case SFP_TYPE_SFP:
         port.set_physical_port_type(PHYSICAL_PORT_TYPE_SFP_CAGE);
         break;

@@ -1,17 +1,5 @@
-/* Copyright 2018-present Barefoot Networks, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2018-present Barefoot Networks, Inc.
+// SPDX-License-Identifier: Apache-2.0
 
 
 #include <algorithm>
@@ -39,8 +27,8 @@ namespace bmv2 {
 Bmv2Switch::Bmv2Switch(PhalInterface* phal_interface,
                        Bmv2ChassisManager* bmv2_chassis_manager,
                        const std::map<uint64, PINode*>& node_id_to_pi_node)
-    : phal_interface_(CHECK_NOTNULL(phal_interface)),
-      bmv2_chassis_manager_(CHECK_NOTNULL(bmv2_chassis_manager)),
+    : phal_interface_(ABSL_DIE_IF_NULL(phal_interface)),
+      bmv2_chassis_manager_(ABSL_DIE_IF_NULL(bmv2_chassis_manager)),
       node_id_to_pi_node_(node_id_to_pi_node) {}
 
 Bmv2Switch::~Bmv2Switch() {}

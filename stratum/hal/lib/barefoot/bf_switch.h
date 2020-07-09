@@ -1,17 +1,5 @@
-/* Copyright 2018-present Barefoot Networks, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2018-present Barefoot Networks, Inc.
+// SPDX-License-Identifier: Apache-2.0
 
 #ifndef STRATUM_HAL_LIB_BAREFOOT_BF_SWITCH_H_
 #define STRATUM_HAL_LIB_BAREFOOT_BF_SWITCH_H_
@@ -22,6 +10,7 @@
 #include <string>
 
 #include "stratum/hal/lib/barefoot/bf_chassis_manager.h"
+#include "stratum/hal/lib/barefoot/bf_pd_interface.h"
 #include "stratum/hal/lib/pi/pi_node.h"
 #include "stratum/hal/lib/common/phal_interface.h"
 #include "stratum/hal/lib/common/switch_interface.h"
@@ -79,6 +68,7 @@ class BFSwitch : public SwitchInterface {
   static std::unique_ptr<BFSwitch> CreateInstance(
       PhalInterface* phal_interface,
       BFChassisManager* bf_chassis_manager,
+      BFPdInterface* bf_pd_interface,
       const std::map<int, pi::PINode*>& unit_to_pi_node);
 
   // BFSwitch is neither copyable nor movable.
@@ -92,6 +82,7 @@ class BFSwitch : public SwitchInterface {
   // class.
   BFSwitch(PhalInterface* phal_interface,
            BFChassisManager* bf_chassis_manager,
+           BFPdInterface* bf_pd_interface,
            const std::map<int, pi::PINode*>& unit_to_pi_node);
 
   // Helper to get PINode pointer from unit number or return error indicating
@@ -110,6 +101,9 @@ class BFSwitch : public SwitchInterface {
   // Per chassis Managers. Note that there is only one instance of this class
   // per chassis.
   BFChassisManager* bf_chassis_manager_;  // not owned by the class.
+
+  // Pointer to a BFPdInterface implementation that wraps PD API calls.
+  BFPdInterface* bf_pd_interface_;  // not owned by this class.
 
   // Map from zero-based unit number corresponding to a node/ASIC to a pointer
   // to PINode which contain all the per-node managers for that node/ASIC. This
