@@ -19,6 +19,10 @@ Build status (master): [![CircleCI](https://circleci.com/gh/stratum/stratum/tree
 
 # Documentation
 
+## Getting Started with SDN / P4 / Stratum
+
+If you're completly new to the world of P4 and are looking for step-by-step instructions with batteries included, the [NG-SDN](https://github.com/opennetworkinglab/ngsdn-tutorial) tutorial is a good starting point. For material more focused on P4 as a language, have a look at the [p4lang](https://github.com/p4lang/tutorials) tutorials. Finally, there is the "Software-Defined Networks: A Systems Approach" book ([HTML](https://sdn.systemsapproach.org/)) for comprehensive coverage of SDN. Also see the chapter about [Stratum](https://sdn.systemsapproach.org/stratum.html#thin-switch-os) in it.
+
 ## Running Stratum
 
 [Broadcom](stratum/hal/bin/bcm/standalone/README.md)
@@ -30,8 +34,6 @@ Build status (master): [![CircleCI](https://circleci.com/gh/stratum/stratum/tree
 [dummy](stratum/hal/bin/dummy/README.md)
 
 [NP4 Intel](stratum/hal/bin/np4intel/docker/README.md)
-
-[Stratum inside Docker](TODO)
 
 ## Other Topics
 
@@ -85,13 +87,18 @@ to program fixed-pipeline switches using the Tomahawk chip from Broadcom.
 
 ## Broadcom
 
-- Edgecore AS7712-32X
-
-- Dell Z9100
-
-- Inventec D7032
-
-- QCT QuantaMesh T7032-IX1
+- Tomahawk
+    - Edgecore AS7712-32X
+    - Edgecore AS7716-24XC Cassini
+    - Dell Z9100
+    - Inventec D7032
+    - QCT QuantaMesh T7032-IX1
+- Tomahawk+
+    - Edgecore AS7716-24SC Cassini
+- Tomahawk2
+- Tomahawk3
+- Trident2
+    - Edgecore AS6712
 
 ## Software Switches
 
@@ -125,4 +132,3 @@ If you are using Docker on Linux, make sure that you can use Docker as a
 non-root user, otherwise you will not be able to run setup_dev_env.sh:
 
     sudo usermod -aG docker $USER
-
